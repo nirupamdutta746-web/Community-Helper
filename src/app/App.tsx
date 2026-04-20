@@ -3,6 +3,9 @@ import { Users, CheckSquare, AlertCircle, Activity } from 'lucide-react';
 import VolunteerMap from './components/VolunteerMap';
 import TaskCard from './components/TaskCard';
 import AssignTaskModal from './components/AssignTaskModal';
+import VolunteerList from './components/VolunteerList';
+import TaskManagement from './components/TaskManagement';
+
 
 interface Volunteer {
   id: number;
@@ -289,6 +292,17 @@ export default function App() {
             </div>
           </div>
         </div>
+      </div>
+      {/* // Temporary container for TaskManagement and VolunteerList components */}
+      <div>
+        {/* We pass a function that takes a new task and adds it to the existing list */}
+        <TaskManagement
+          onAddTask={(newTask: Task) => setTasks(prevTasks => [...prevTasks, newTask])}
+        />
+        <VolunteerList
+          volunteers={volunteers}
+          onAddVolunteer={(newVol: Volunteer) => setVolunteers(prev => [...prev, newVol])}
+        />
       </div>
 
       {selectedTask && (
