@@ -1,15 +1,5 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-
-// Define the interface to match App.tsx exactly
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  priority: 'urgent' | 'high' | 'medium' | 'low';
-  location: string;
-  estimatedTime: string;
-  assignedTo: string | null;
-}
+import type { Task } from '../App'; 
 
 interface TaskManagementProps {
   onAddTask: (task: Task) => void;
@@ -29,23 +19,22 @@ const TaskManagement: React.FC<TaskManagementProps> = ({ onAddTask }) => {
 
   const handleTaskSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
-    // Construct the full Task object required by App.tsx
     const newTask: Task = {
-      id: Date.now(), // Generate a unique ID
+      id: Date.now(),
       title: taskForm.title,
       description: taskForm.description,
       priority: taskForm.priority,
-      location: 'Remote / Office', // Default value
-      estimatedTime: 'TBD',         // Default value
+      location: 'Remote / Office',
+      estimatedTime: 'TBD',
       assignedTo: null,
+      status: 'pending', 
     };
 
-    onAddTask(newTask); // Update the state in App.tsx
-    alert('Task successfully added to the dashboard!');
+    onAddTask(newTask);
     
     // Reset form
     setTaskForm({ title: '', description: '', priority: 'medium' });
+    alert('Task successfully added to the dashboard!');
   };
 
   return (
