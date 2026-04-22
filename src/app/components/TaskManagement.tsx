@@ -1,11 +1,15 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-import type { Task } from '../App'; 
+import { db } from '../../firebase';
+// 1. Import the Firestore functions
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 interface TaskManagementProps {
-  onAddTask: (task: Task) => void;
+  // We keep this for backward compatibility, but we won't need it 
+  // to update the UI since the onSnapshot listener handles that.
+  onAddTask?: (task: any) => void;
 }
 
-const TaskManagement: React.FC<TaskManagementProps> = ({ onAddTask }) => {
+const TaskManagement: React.FC<TaskManagementProps> = () => {
   const [taskForm, setTaskForm] = useState({
     title: '',
     description: '',
@@ -17,24 +21,31 @@ const TaskManagement: React.FC<TaskManagementProps> = ({ onAddTask }) => {
     setTaskForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleTaskSubmit = (e: FormEvent) => {
+  const handleTaskSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const newTask: Task = {
-      id: Date.now(),
-      title: taskForm.title,
-      description: taskForm.description,
-      priority: taskForm.priority,
-      location: 'Remote / Office',
-      estimatedTime: 'TBD',
-      assignedTo: null,
-      status: 'pending', 
-    };
 
-    onAddTask(newTask);
-    
-    // Reset form
-    setTaskForm({ title: '', description: '', priority: 'medium' });
-    alert('Task successfully added to the dashboard!');
+    try {
+      // 2. Write directly to the "tasks" collection in Firebase
+      await addDoc(collection(db, "tasks"), {
+        title: taskForm.title,
+        description: taskForm.description,
+        priority: taskForm.priority,
+        location: 'Remote / Office',
+        estimatedTime: 'TBD',
+        assignedTo: null,
+        status: 'pending',
+        // Using serverTimestamp ensures consistent timing across all users
+        createdAt: serverTimestamp() 
+      });
+
+      // 3. Reset form and notify user
+      setTaskForm({ title: '', description: '', priority: 'medium' });
+      alert('Task successfully posted to the cloud!');
+      
+    } catch (error) {
+      console.error("Error adding task to Firebase:", error);
+      alert('Failed to post task. Check your internet or Firebase rules.');
+    }
   };
 
   return (
@@ -49,7 +60,7 @@ const TaskManagement: React.FC<TaskManagementProps> = ({ onAddTask }) => {
               name="title"
               value={taskForm.title}
               onChange={handleTaskChange}
-              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
           </div>
@@ -59,7 +70,7 @@ const TaskManagement: React.FC<TaskManagementProps> = ({ onAddTask }) => {
               name="priority"
               value={taskForm.priority}
               onChange={handleTaskChange}
-              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -74,15 +85,15 @@ const TaskManagement: React.FC<TaskManagementProps> = ({ onAddTask }) => {
               value={taskForm.description}
               onChange={handleTaskChange}
               rows={3}
-              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border"
+              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 font-medium"
+            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 font-medium transition-colors shadow-sm"
           >
-            Post Task
+            Post Task to Dashboard
           </button>
         </form>
       </section>

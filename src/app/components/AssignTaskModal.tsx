@@ -1,7 +1,7 @@
 import { X, User, MapPin } from 'lucide-react';
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   description: string;
   priority: 'urgent' | 'high' | 'medium' | 'low';
@@ -11,7 +11,7 @@ interface Task {
 }
 
 interface Volunteer {
-  id: number;
+  id: string;
   name: string;
   role: string;
   status: string;

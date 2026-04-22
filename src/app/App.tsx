@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { collection, onSnapshot, updateDoc, doc, addDoc } from "firebase/firestore";
+import { db } from '../firebase';
 import { Users, CheckSquare, AlertCircle, Activity } from 'lucide-react';
 import VolunteerMap from './components/VolunteerMap';
 import TaskCard from './components/TaskCard';
@@ -7,7 +9,7 @@ import VolunteerList from './components/VolunteerList';
 import TaskManagement from './components/TaskManagement';
 
 export interface Volunteer {
-  id: number;
+  id: string;
   name: string;
   role: string;
   status: string;
@@ -16,87 +18,148 @@ export interface Volunteer {
 }
 
 export interface Task {
-  id: number;
+  id: string; // Force this to string
   title: string;
   description: string;
   priority: 'urgent' | 'high' | 'medium' | 'low';
   location: string;
   estimatedTime: string;
-  assignedTo: string | null;
-  status: 'pending' | 'in-progress' | 'awaiting-review' | 'completed'; // Added for verification
-  proofUrl?: string; // Added to store verification link
+  assignedTo: string | null; // Allow null for unassigned tasks
+  status: 'pending' | 'in-progress' | 'awaiting-review' | 'completed';
+  proofUrl?: string;
 }
 
 export default function App() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [volunteers, setVolunteers] = useState<Volunteer[]>([
-    { id: 1, name: 'Sarah Johnson', role: 'Medical Support', status: 'active', position: { x: 25, y: 30 }, currentTask: 'Medical Kit Distribution' },
-    { id: 2, name: 'Michael Chen', role: 'Logistics', status: 'active', position: { x: 60, y: 45 }, currentTask: null },
-    { id: 3, name: 'Emma Williams', role: 'Food Distribution', status: 'active', position: { x: 40, y: 65 }, currentTask: 'Community Kitchen Setup' },
-    { id: 4, name: 'James Rodriguez', role: 'Transportation', status: 'active', position: { x: 75, y: 25 }, currentTask: null },
-    { id: 5, name: 'Lisa Anderson', role: 'Community Outreach', status: 'active', position: { x: 50, y: 50 }, currentTask: null },
-    { id: 6, name: 'David Kumar', role: 'Medical Support', status: 'active', position: { x: 30, y: 75 }, currentTask: 'Emergency Response' }
+    // { id: '1', name: 'Sarah Johnson', role: 'Medical Support', status: 'active', position: { x: 25, y: 30 }, currentTask: 'Medical Kit Distribution' },
+    // { id: '2', name: 'Michael Chen', role: 'Logistics', status: 'active', position: { x: 60, y: 45 }, currentTask: null },
+    // { id: '3', name: 'Emma Williams', role: 'Food Distribution', status: 'active', position: { x: 40, y: 65 }, currentTask: 'Community Kitchen Setup' },
+    // { id: '4', name: 'James Rodriguez', role: 'Transportation', status: 'active', position: { x: 75, y: 25 }, currentTask: null },
+    // { id: '5', name: 'Lisa Anderson', role: 'Community Outreach', status: 'active', position: { x: 50, y: 50 }, currentTask: null },
+    // { id: '6', name: 'David Kumar', role: 'Medical Support', status: 'active', position: { x: 30, y: 75 }, currentTask: 'Emergency Response' }
   ]);
 
   const [tasks, setTasks] = useState<Task[]>([
-    { id: 1, title: 'Medical Kit Distribution', description: 'Distribute medical supplies', priority: 'urgent', location: 'Downtown', estimatedTime: '2h', assignedTo: 'Sarah Johnson', status: 'in-progress' },
-    { id: 2, title: 'Food Bank Restocking', description: 'Restocking needed', priority: 'urgent', location: 'Central Bank', estimatedTime: '3h', assignedTo: null, status: 'pending' },
-    { id: 3, title: 'Community Kitchen Setup', description: 'Prepare meal service', priority: 'high', location: 'Community Center', estimatedTime: '4h', assignedTo: 'Emma Williams', status: 'in-progress' },
-    { id: 4, title: 'Emergency Response', description: 'Medical assistance required', priority: 'urgent', location: 'Riverside', estimatedTime: '1h', assignedTo: 'David Kumar', status: 'in-progress' }
+    //   { id: '1', title: 'Medical Kit Distribution', description: 'Distribute medical supplies', priority: 'urgent', location: 'Downtown', estimatedTime: '2h', assignedTo: 'Sarah Johnson', status: 'in-progress' },
+    //   { id: '2', title: 'Food Bank Restocking', description: 'Restocking needed', priority: 'urgent', location: 'Central Bank', estimatedTime: '3h', assignedTo: null, status: 'pending' },
+    //   { id: '3', title: 'Community Kitchen Setup', description: 'Prepare meal service', priority: 'high', location: 'Community Center', estimatedTime: '4h', assignedTo: 'Emma Williams', status: 'in-progress' },
+    //   { id: '4', title: 'Emergency Response', description: 'Medical assistance required', priority: 'urgent', location: 'Riverside', estimatedTime: '1h', assignedTo: 'David Kumar', status: 'in-progress' }
   ]);
 
-  const handleAssignTask = (volunteer: Volunteer) => {
+  useEffect(() => {
+    // This sets up a "Live Stream" from the 'tasks' collection
+    const unsubscribe = onSnapshot(collection(db, "tasks"), (snapshot) => {
+      const taskData = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id// Firebase uses string IDs
+      })) as Task[];
+      setTasks(taskData);
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "volunteers"), (snapshot) => {
+      const volList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Volunteer[];
+      setVolunteers(volList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // --- UPDATED ASSIGNMENT LOGIC ---
+  const handleAssignTask = async (volunteer: Volunteer) => {
     if (!selectedTask) return;
-    setTasks(tasks.map(task =>
-      task.id === selectedTask.id ? { ...task, assignedTo: volunteer.name, status: 'in-progress' } : task
-    ));
-    setVolunteers(volunteers.map(v =>
-      v.id === volunteer.id ? { ...v, currentTask: selectedTask.title } : v
-    ));
-    setSelectedTask(null);
+
+    const taskRef = doc(db, "tasks", selectedTask.id);
+    const volRef = doc(db, "volunteers", volunteer.id);
+
+    try {
+      // 1. Update Task in Cloud
+      await updateDoc(taskRef, {
+        assignedTo: volunteer.name,
+        status: 'in-progress'
+      });
+
+      // 2. Update Volunteer in Cloud
+      await updateDoc(volRef, {
+        currentTask: selectedTask.title
+      });
+
+      setSelectedTask(null);
+    } catch (error) {
+      console.error("Error assigning task:", error);
+      alert("Failed to assign task. Check your connection.");
+    }
   };
 
-  // --- NEW VERIFICATION LOGIC ---
-  
-  const handleSubmitForReview = (taskId: number) => {
-    const proof = prompt("Please enter the URL/Link as proof of work (e.g., photo link or report):");
+  // --- UPDATED REVIEW LOGIC ---
+  const handleSubmitForReview = async (taskId: string) => {
+    const proof = prompt("Please enter the URL/Link as proof of work:");
     if (!proof) return;
 
-    setTasks(prev => prev.map(t => 
-      t.id === taskId ? { ...t, status: 'awaiting-review', proofUrl: proof } : t
-    ));
+    const taskRef = doc(db, "tasks", taskId);
+
+    try {
+      await updateDoc(taskRef, {
+        status: 'awaiting-review',
+        proofUrl: proof
+      });
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
   };
 
-  const handleVerifyTask = (taskId: number) => {
+  // --- UPDATED VERIFICATION LOGIC ---
+  const handleVerifyTask = async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // 1. Mark task as completed in the master list
-    setTasks(prev => prev.map(t => 
-      t.id === taskId ? { ...t, status: 'completed', assignedTo: null, priority: 'low' } : t
-    ));
+    const taskRef = doc(db, "tasks", taskId);
 
-    // 2. Free up the volunteer so they can take new tasks
-    if (task.assignedTo) {
-      setVolunteers(prev => prev.map(v => 
-        v.name === task.assignedTo ? { ...v, currentTask: null } : v
-      ));
+    // We need to find the volunteer document to clear their "Busy" status
+    const volunteer = volunteers.find(v => v.name === task.assignedTo);
+
+    try {
+      // 1. Mark Task as Completed
+      await updateDoc(taskRef, {
+        status: 'completed',
+        assignedTo: null,
+        priority: 'low'
+      });
+
+      // 2. Release the Volunteer in the Cloud
+      if (volunteer) {
+        const volRef = doc(db, "volunteers", volunteer.id);
+        await updateDoc(volRef, { currentTask: null });
+      }
+
+      alert(`Task "${task.title}" verified!`);
+    } catch (error) {
+      console.error("Error verifying task:", error);
     }
-    alert(`Task "${task.title}" has been officially verified!`);
   };
 
   // ------------------------------
 
   const urgentTasks = tasks.filter(t => t.priority === 'urgent' && t.status !== 'completed');
   const availableVolunteers = volunteers.filter(v => !v.currentTask);
-  const activeVolunteers = volunteers.filter(v => v.status === 'active');
+  // This counts them as active if their status is 'active' or 'available'
+  const activeVolunteers = volunteers.filter(v =>
+    v.status.toLowerCase() === 'active' || v.status.toLowerCase() === 'available'
+  );
 
   return (
     <div className="size-full bg-gradient-to-br from-slate-50 to-slate-100 p-6 overflow-auto">
       <div className="max-w-[1800px] mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">NGO Admin Terminal</h1>
-          <p className="text-slate-600">Real-time volunteer coordination and verification</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2 text-center">NGO Admin Terminal</h1>
+          <p className="text-slate-600 text-center">Real-time volunteer coordination and verification</p>
         </div>
 
         {/* Stats Row */}
@@ -155,7 +218,7 @@ export default function App() {
                 Live Operational Map
               </h2>
               <div className="h-[400px]">
-                <VolunteerMap volunteers={volunteers} onVolunteerClick={() => {}} />
+                <VolunteerMap volunteers={volunteers} onVolunteerClick={() => { }} />
               </div>
             </div>
 
@@ -208,9 +271,8 @@ export default function App() {
                         <div className="text-[10px] text-slate-500">{volunteer.role}</div>
                       </div>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                      volunteer.currentTask ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-green-100 text-green-700 border-green-200'
-                    }`}>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${volunteer.currentTask ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-green-100 text-green-700 border-green-200'
+                      }`}>
                       {volunteer.currentTask ? 'Busy' : 'Available'}
                     </span>
                   </div>
@@ -221,8 +283,15 @@ export default function App() {
         </div>
 
         <div className="mt-10">
-          <TaskManagement onAddTask={(newTask: Task) => setTasks(prev => [...prev, { ...newTask, status: 'pending' }])} />
-          <VolunteerList volunteers={volunteers} onAddVolunteer={(newVol: Volunteer) => setVolunteers(prev => [...prev, newVol])} />
+          <TaskManagement />
+          <VolunteerList
+            volunteers={volunteers}
+            onAddVolunteer={async (newVol) => {
+              // Exclude the ID so Firebase can generate a fresh one
+              const { id, ...data } = newVol;
+              await addDoc(collection(db, "volunteers"), data);
+            }}
+          />
         </div>
       </div>
 

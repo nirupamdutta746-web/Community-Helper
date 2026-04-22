@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-
-// Define the structure to match App.tsx
-interface Volunteer {
-  id: number;
-  name: string;
-  role: string;
-  status: string;
-  position: { x: number; y: number };
-  currentTask: string | null;
-}
+import type { Volunteer } from '../App';
+// interface Volunteer {
+//   id: string;
+//   name: string;
+//   role: string;
+//   status: string;
+//   position: { x: number; y: number };
+//   currentTask: string | null;
+// }
 
 interface VolunteerListProps {
   volunteers: Volunteer[];
@@ -31,7 +30,7 @@ const VolunteerList: React.FC<VolunteerListProps> = ({ volunteers, onAddVoluntee
     
     // Create the full object expected by App.tsx
     const newVolunteer: Volunteer = {
-      id: Date.now(),
+      id: Date.now().toString(),
       name: formData.name,
       role: formData.role || 'General Volunteer',
       status: 'active',

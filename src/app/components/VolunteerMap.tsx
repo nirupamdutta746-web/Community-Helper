@@ -1,18 +1,21 @@
 import { MapPin, User } from 'lucide-react';
+// At the top of VolunteerMap.tsx
+import type { Volunteer } from '../App'; 
 
-interface Volunteer {
-  id: number;
-  name: string;
-  role: string;
-  status: string;
-  position: { x: number; y: number };
-  currentTask: string | null;
-}
-
+// Then update your Props interface to use it
 interface VolunteerMapProps {
-  volunteers: Volunteer[];
-  onVolunteerClick: (volunteer: Volunteer) => void;
+  volunteers: Volunteer[]; // This will now correctly expect string IDs
+    onVolunteerClick: (volunteer: Volunteer) => void;
 }
+
+// interface Volunteer {
+//   id: string;
+//   name: string;
+//   role: string;
+//   status: string;
+//   position: { x: number; y: number };
+//   currentTask: string | null;
+
 
 export default function VolunteerMap({ volunteers, onVolunteerClick }: VolunteerMapProps) {
   return (
