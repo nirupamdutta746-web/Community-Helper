@@ -1,104 +1,119 @@
-import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-import { db } from '../../firebase';
-// 1. Import the Firestore functions
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useState } from 'react';
+import type { Task } from '../App';
 
 interface TaskManagementProps {
-  // We keep this for backward compatibility, but we won't need it 
-  // to update the UI since the onSnapshot listener handles that.
-  onAddTask?: (task: any) => void;
+  tasks: Task[];
+  onAddTask: (task: Omit<Task, 'id'>) => void; // Callback to save to Firebase
 }
 
-const TaskManagement: React.FC<TaskManagementProps> = () => {
-  const [taskForm, setTaskForm] = useState({
+export default function TaskManagement({ tasks, onAddTask }: TaskManagementProps) {
+  const [showForm, setShowForm] = useState(false);
+  const [newTask, setNewTask] = useState({
     title: '',
+    location: '',
+    priority: 'medium' as Task['priority'],
     description: '',
-    priority: 'medium' as 'urgent' | 'high' | 'medium' | 'low',
+    estimatedTime: ''
   });
 
-  const handleTaskChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setTaskForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleTaskSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    try {
-      // 2. Write directly to the "tasks" collection in Firebase
-      await addDoc(collection(db, "tasks"), {
-        title: taskForm.title,
-        description: taskForm.description,
-        priority: taskForm.priority,
-        location: 'Remote / Office',
-        estimatedTime: 'TBD',
-        assignedTo: null,
-        status: 'pending',
-        // Using serverTimestamp ensures consistent timing across all users
-        createdAt: serverTimestamp() 
-      });
-
-      // 3. Reset form and notify user
-      setTaskForm({ title: '', description: '', priority: 'medium' });
-      alert('Task successfully posted to the cloud!');
-      
-    } catch (error) {
-      console.error("Error adding task to Firebase:", error);
-      alert('Failed to post task. Check your internet or Firebase rules.');
-    }
+    onAddTask({
+      ...newTask,
+      status: 'pending',
+      assignedTo: null
+    });
+    setNewTask({ title: '', location: '', priority: 'medium', description: '', estimatedTime: '' });
+    setShowForm(false);
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8">
-      <section className="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-        <h2 className="text-xl font-semibold mb-4 text-indigo-600">Add New Task</h2>
-        <form onSubmit={handleTaskSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Task Title</label>
-            <input
-              type="text"
-              name="title"
-              value={taskForm.title}
-              onChange={handleTaskChange}
-              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Priority</label>
-            <select
-              name="priority"
-              value={taskForm.priority}
-              onChange={handleTaskChange}
-              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Description</label>
-            <textarea
-              name="description"
-              value={taskForm.description}
-              onChange={handleTaskChange}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm p-2 border focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 font-medium transition-colors shadow-sm"
+    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-slate-900">Task Management Registry</h2>
+        <button 
+          onClick={() => setShowForm(!showForm)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+        >
+          {showForm ? 'Cancel' : '+ Create Task'}
+        </button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleSubmit} className="mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            placeholder="Task Title"
+            className="p-2 border rounded"
+            value={newTask.title}
+            onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+            required
+          />
+          <input
+            placeholder="Location"
+            className="p-2 border rounded"
+            value={newTask.location}
+            onChange={(e) => setNewTask({...newTask, location: e.target.value})}
+            required
+          />
+          <select 
+            className="p-2 border rounded"
+            value={newTask.priority}
+            onChange={(e) => setNewTask({...newTask, priority: e.target.value as any})}
           >
-            Post Task to Dashboard
+            <option value="low">Low Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="high">High Priority</option>
+            <option value="urgent">Urgent</option>
+          </select>
+          <input
+            placeholder="Estimated Time (e.g. 2 hours)"
+            className="p-2 border rounded"
+            value={newTask.estimatedTime}
+            onChange={(e) => setNewTask({...newTask, estimatedTime: e.target.value})}
+          />
+          <textarea
+            placeholder="Task Description"
+            className="p-2 border rounded md:col-span-2"
+            value={newTask.description}
+            onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+          />
+          <button type="submit" className="md:col-span-2 bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700">
+            Save Task to Registry
           </button>
         </form>
-      </section>
+      )}
+
+      {/* Existing Table Code */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-slate-100">
+              <th className="py-3 px-4 text-sm font-semibold text-slate-600">Task Title</th>
+              <th className="py-3 px-4 text-sm font-semibold text-slate-600">Location</th>
+              <th className="py-3 px-4 text-sm font-semibold text-slate-600">Priority</th>
+              <th className="py-3 px-4 text-sm font-semibold text-slate-600">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.map((task) => (
+              <tr key={task.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                <td className="py-3 px-4 text-sm font-medium text-slate-900">{task.title}</td>
+                <td className="py-3 px-4 text-sm text-slate-600">{task.location}</td>
+                <td className="py-3 px-4">
+                  <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-md ${
+                    task.priority === 'urgent' ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {task.priority}
+                  </span>
+                </td>
+                <td className="py-3 px-4">
+                  <span className="text-xs text-slate-500 capitalize">{task.status.replace('-', ' ')}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-};
-
-export default TaskManagement;
+}
