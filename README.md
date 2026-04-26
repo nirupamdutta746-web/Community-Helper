@@ -1,7 +1,7 @@
-#Community Helper 🤝
+# Community Helper 🤝
 A streamlined, terminal-inspired administration dashboard designed for NGOs to manage community resources and personnel. This project solves the problem of cluttered administrative interfaces by providing a clean, command-line-style environment for tracking volunteer directories and real-time emergency tasks.
 
-##🛠️ Technologies Used
+## 🛠️ Technologies Used
 React.js - Component-based UI development
 
 Tailwind CSS - Utility-first styling for the terminal aesthetic
@@ -10,7 +10,7 @@ JavaScript (ES6+) - Logic and interactivity
 
 Lucide React - Minimalist iconography
 
-##📂 Project Structure
+## 📂 Project Structure
 Plaintext
 ├── src/
 │   ├── components/
@@ -22,7 +22,7 @@ Plaintext
 ├── public/                       # Static assets
 ├── package.json                  # Dependencies and scripts
 └── README.md
-##🚀 Installation Instructions
+## 🚀 Installation Instructions
 Follow these steps to get the project running on your local machine:
 
 Clone the repository:
@@ -41,7 +41,8 @@ Start the development server:
 
 Bash
 npm start
-##💡 Usage Examples
+
+## 💡 Usage Examples
 Accessing the Dashboard
 Once the server is running, navigate to http://localhost:3000 in your browser. The interface is designed as an interactive terminal.
 
