@@ -1,16 +1,32 @@
 # Community Helper 🤝
-A streamlined, terminal-inspired administration dashboard designed for NGOs to manage community resources and personnel. This project solves the problem of cluttered administrative interfaces by providing a clean, command-line-style environment for tracking volunteer directories and real-time emergency tasks.
+Community Helper is a robust, terminal-inspired dashboard designed to streamline NGO operations. By providing a centralized, command-line-style interface, it simplifies the management of volunteer databases and high-priority emergency tasks, ensuring that community aid is coordinated with precision and speed.
+
+## ✨ Key Features
+- Terminal-Centric Dashboard: A clean, high-efficiency UI for rapid data oversight.
+
+- Volunteer Management: Full-width directory tracking and specialized volunteer views.
+
+- Real-Time Task Feed: Organized emergency task management to prioritize urgent community needs.
+
+- Secure Infrastructure: Integrated with Firebase for real-time data syncing and secure user authentication.
+
+## 🛣️ Future Prospects & Roadmap
+We are actively working to evolve Community Helper into a full-scale coordination suite. Upcoming features include:
+
+- Live Volunteer Mapping: Integration of a real-time geospatial system to track and display the live location of all active volunteers for better task delegation.
+
+- Volunteer Honor System: A points-based gamification engine that tracks the completion rate and reliability of every team member.
+
+- Volunteer Leaderboard: A competitive ranking system to recognize top contributors and boost community engagement through "Honor Points."
 
 ## 🛠️ Technologies Used
-Vite - For a lightning-fast development environment and bundling.
+Vite & React: High-performance frontend framework.
 
-TypeScript - Providing type safety across the terminal and data components.
+TypeScript: Type-safe development for scalable architecture.
 
-Firebase - Powering real-time database updates and authentication.
+Firebase: Backend-as-a-Service for Auth and Real-time DB.
 
-React - The core library for the UI.
-
-Tailwind CSS - Used for the "NGO Admin Terminal" aesthetic and organized layouts.
+Tailwind CSS: Professional, terminal-grade styling.
 
 Lucide React - Minimalist iconography
 
