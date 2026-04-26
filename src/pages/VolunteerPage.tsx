@@ -48,7 +48,7 @@ export default function VolunteerDashboard() {
         // 2. Fetch Tasks assigned to this specific name found in Firestore
         const q = query(
           collection(db, "tasks"),
-          where("assignedToId", "==", userData.name)
+          where("assignedToId", "==", currentUser.uid)
         );
 
         unsubTasks = onSnapshot(q, (snapshot) => {
@@ -63,8 +63,12 @@ export default function VolunteerDashboard() {
           const latestUrgent = taskList.find(t => t.priority === 'urgent' && t.status === 'pending');
           if (latestUrgent) setEmergencyNotification(latestUrgent);
         });
+        return unsubTasks;
       }
     };
+    fetchProfileAndTasks().then(unsub => {
+      if (unsub) return () => unsub();
+    });
 
     // 4. Fetch the volunteer's map data (status, position)
     const unsubVolMap = onSnapshot(doc(db, "volunteers", currentUser.uid), (doc) => {

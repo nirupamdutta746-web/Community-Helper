@@ -57,16 +57,24 @@ export default function AdminTerminal() {
 
     const handleAssignTask = async (volunteer: Volunteer) => {
         if (!selectedTask) return;
-        const taskRef = doc(db, "tasks", selectedTask.id);
-        const volRef = doc(db, "volunteers", volunteer.id);
 
         try {
+            const taskRef = doc(db, "tasks", selectedTask.id);
+            const volRef = doc(db, "volunteers", volunteer.id);
+            const userProfileRef = doc(db, "users", volunteer.id); // The Volunteer's profile
+
             await updateDoc(taskRef, {
                 assignedTo: volunteer.name,
                 assignedToId: volunteer.id, // 👈 ADD THIS
                 status: 'in-progress'
             });
-            await updateDoc(volRef, { currentTask: selectedTask.title });
+            await updateDoc(volRef, {
+                currentTask: selectedTask.title,
+                status: 'busy' // Ensure status is set to 'busy'
+            });
+            await updateDoc(userProfileRef, {
+                currentTask: selectedTask.title
+            });
             setSelectedTask(null);
         } catch (error) {
             console.error("Error assigning task:", error);
@@ -132,13 +140,13 @@ export default function AdminTerminal() {
                     <h1 className="text-3xl font-bold text-slate-900 mb-2">NGO Admin Terminal</h1>
                     <p className="text-slate-600">Real-time volunteer coordination and verification</p>
                     {/* FIXED: This button now "reads" and "sets" showAddTask */}
-                    {/* <button
+                    <button
                         onClick={() => setShowAddTask(!showAddTask)}
                         className={`px-6 py-2 rounded-lg font-bold transition-all shadow-lg flex items-center gap-2 ${showAddTask ? 'bg-slate-200 text-slate-700' : 'bg-blue-600 text-white hover:bg-blue-700'
                             }`}
                     >
                         {showAddTask ? 'Close Task Form' : '+ Create New Task'}
-                    </button> */}
+                    </button>
                     {/* Logout Button */}
                     <div className='text-right'>
                         <button
