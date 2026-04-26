@@ -11,6 +11,7 @@ JavaScript (ES6+) - Logic and interactivity
 Lucide React - Minimalist iconography
 
 ## 📂 Project Structure
+```
 Plaintext
 ├── src/
 │   ├── components/
@@ -22,6 +23,8 @@ Plaintext
 ├── public/                       # Static assets
 ├── package.json                  # Dependencies and scripts
 └── README.md
+```
+
 ## 🚀 Installation Instructions
 Follow these steps to get the project running on your local machine:
 
