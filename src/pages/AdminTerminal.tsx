@@ -18,28 +18,41 @@ export default function AdminTerminal() {
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [showAddTask, setShowAddTask] = useState(false); // Controls the task form visibility
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "tasks"), (snapshot) => {
+        // 1. Listen to Tasks
+        const unsubTasks = onSnapshot(collection(db, "tasks"), (snapshot) => {
             const taskData = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
             })) as Task[];
             setTasks(taskData);
         });
-        return () => unsubscribe();
-    }, []);
 
-    useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, "volunteers"), (snapshot) => {
-            const volList = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Volunteer[];
+        // 2. Listen to Volunteers with "Position Safety"
+        const unsubVols = onSnapshot(collection(db, "volunteers"), (snapshot) => {
+            const volList = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    // SAFETY: Fallback position prevents the 'x' undefined error
+                    position: data.position || { x: 50, y: 50 }
+                } as Volunteer;
+            });
             setVolunteers(volList);
+            setLoading(false); // Data is ready, stop loading
+        }, (error) => {
+            console.error("Firestore error:", error);
+            setLoading(false);
         });
-        return () => unsubscribe();
+
+        return () => {
+            unsubTasks();
+            unsubVols();
+        };
     }, []);
 
     const handleAssignTask = async (volunteer: Volunteer) => {
@@ -48,7 +61,11 @@ export default function AdminTerminal() {
         const volRef = doc(db, "volunteers", volunteer.id);
 
         try {
-            await updateDoc(taskRef, { assignedTo: volunteer.name, status: 'in-progress' });
+            await updateDoc(taskRef, {
+                assignedTo: volunteer.name,
+                assignedToId: volunteer.id, // 👈 ADD THIS
+                status: 'in-progress'
+            });
             await updateDoc(volRef, { currentTask: selectedTask.title });
             setSelectedTask(null);
         } catch (error) {
@@ -89,13 +106,25 @@ export default function AdminTerminal() {
 
     const handleLogout = async () => {
         try {
+            const user = auth.currentUser;
+            if (user) {
+                await updateDoc(doc(db, "volunteers", user.uid), {
+                    status: "offline"
+                });
+            }
             await signOut(auth);
             navigate('/login'); // Redirect to login after signing out
         } catch (error) {
             console.error("Error logging out:", error);
         }
     };
-
+    if (loading) {
+        return (
+            <div className="h-screen w-screen flex items-center justify-center bg-slate-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
     return (
         <div className="size-full bg-gradient-to-br from-slate-50 to-slate-100 p-6 overflow-auto">
             <div className="max-w-[1800px] mx-auto">
@@ -112,14 +141,14 @@ export default function AdminTerminal() {
                     </button> */}
                     {/* Logout Button */}
                     <div className='text-right'>
-                        <button 
+                        <button
                             onClick={handleLogout}
                             className="bg-white text-red-600 border border-red-200 px-6 py-2 rounded-lg font-bold hover:bg-red-50 transition-all"
                         >
                             Logout
                         </button>
                     </div>
-                        
+
                 </div>
 
                 {/* Stats Row */}

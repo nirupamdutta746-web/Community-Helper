@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../firebase'; // Import db
-import { doc, getDoc } from 'firebase/firestore'; // Import Firestore methods
+import { auth, db } from '../firebase';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
@@ -9,36 +9,51 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("Login attempt started...");
+        console.log('Login attempt started...');
         
+
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
             const user = userCredential.user;
-            console.log("Auth Success! UID:", user.uid);
+            console.log('Auth Success! UID:', user.uid);
 
-            // Fetch the role directly here to decide where to go
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            
+            const volunteerRef = doc(db, 'volunteers', user.uid);
+            const volunteerSnap = await getDoc(volunteerRef);
+
+            if (!volunteerSnap.exists()) {
+                console.log('Volunteer doc missing → creating one');
+                await setDoc(volunteerRef, {
+                    name: 'New Volunteer',
+                    role: 'volunteer',
+                    status: 'active',
+                    currentTask: null,
+                    position: { x: 25, y: 50 }
+                });
+            } else {
+                await updateDoc(volunteerRef, { status: 'active' });
+            }
+
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
                 const role = userDoc.data().role;
-                console.log("Role found:", role);
+                console.log('Role found:', role);
 
                 if (role === 'admin') {
                     navigate('/admin');
                 } else if (role === 'volunteer') {
                     navigate('/volunteer');
                 } else {
-                    console.error("Unknown role:", role);
-                    navigate('/'); // Fallback
+                    console.error('Unknown role:', role);
+                    navigate('/');
                 }
             } else {
-                console.error("No user document found in Firestore for this UID.");
-                alert("Account authenticated but no profile found. Please contact admin.");
+                console.error('No user document found in Firestore for this UID.');
+                alert('Account authenticated but no profile found. Please contact admin.');
             }
         } catch (error: any) {
-            console.error("Login failed:", error.code);
+            console.error('Login failed:', error.code);
             alert(error.message);
         }
     };
@@ -72,3 +87,4 @@ export default function LoginPage() {
         </div>
     );
 }
+      

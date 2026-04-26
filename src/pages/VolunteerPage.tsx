@@ -12,8 +12,14 @@ export default function VolunteerDashboard() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [proofLink, setProofLink] = useState<string>("");
 
-  const handleLogout = () => {
-    signOut(auth);
+  const handleLogout = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      await updateDoc(doc(db, "volunteers", user.uid), {
+        status: "offline"
+      });
+    }
+    await signOut(auth);
   };
 
   useEffect(() => {
@@ -25,18 +31,24 @@ export default function VolunteerDashboard() {
     // 1. Fetch Volunteer's name from the 'users' collection instead of auth profile
     const fetchProfileAndTasks = async () => {
       const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-      
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        const nameFromFirestore = userData.name;
 
         // Update local volunteer state for the UI
-        setVolunteerData({ id: userDoc.id, ...userData } as Volunteer);
+        setVolunteerData({
+          id: userDoc.id,
+          name: userData.name || "Volunteer",
+          role: userData.role || "volunteer",
+          status: userData.status || "active",
+          currentTask: userData.currentTask || null,
+          position: userData.position || { x: 20, y: 50 }
+        } as Volunteer);
 
         // 2. Fetch Tasks assigned to this specific name found in Firestore
         const q = query(
           collection(db, "tasks"),
-          where("assignedTo", "==", nameFromFirestore)
+          where("assignedToId", "==", userData.name)
         );
 
         unsubTasks = onSnapshot(q, (snapshot) => {
@@ -44,7 +56,7 @@ export default function VolunteerDashboard() {
             id: doc.id,
             ...doc.data()
           })) as Task[];
-          
+
           setTasks(taskList);
 
           // 3. Check for new Urgent/Pending tasks for notification
