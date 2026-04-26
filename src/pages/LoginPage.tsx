@@ -56,7 +56,7 @@ export default function LoginPage() {
                 const newStatus = existingData.currentTask ? 'busy' : 'active';
 
                 await updateDoc(volunteerRef, {
-                    status: newStatus // This ensures they stay 'busy' if they have a task
+                    status: newStatus 
                 });
             }
         } catch (error: any) {

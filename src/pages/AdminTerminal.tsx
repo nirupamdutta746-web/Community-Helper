@@ -17,7 +17,6 @@ export default function AdminTerminal() {
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
-    const [showAddTask, setShowAddTask] = useState(false); // Controls the task form visibility
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -88,11 +87,18 @@ export default function AdminTerminal() {
         const volunteer = volunteers.find(v => v.name === task.assignedTo);
 
         try {
-            await updateDoc(taskRef, { status: 'completed', assignedTo: null, priority: 'low' });
+            await updateDoc(taskRef, { status: 'completed', 
+                assignedTo: null, 
+                priority: 'low' });
             if (volunteer) {
-                await updateDoc(doc(db, "volunteers", volunteer.id), { currentTask: null });
+                await updateDoc(doc(db, "volunteers", volunteer.id),
+                 { currentTask: null , status: 'active' });
             }
-            alert(`Task verified!`);
+            await updateDoc(doc(db, "users", volunteer.id), { 
+                currentTask: null,
+                status: 'active' 
+            });  
+            alert(`Task verified! Volunteer is now available.`);
         } catch (error) {
             console.error("Error verifying task:", error);
         }
@@ -139,14 +145,6 @@ export default function AdminTerminal() {
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-slate-900 mb-2">NGO Admin Terminal</h1>
                     <p className="text-slate-600">Real-time volunteer coordination and verification</p>
-                    {/* FIXED: This button now "reads" and "sets" showAddTask */}
-                    <button
-                        onClick={() => setShowAddTask(!showAddTask)}
-                        className={`px-6 py-2 rounded-lg font-bold transition-all shadow-lg flex items-center gap-2 ${showAddTask ? 'bg-slate-200 text-slate-700' : 'bg-blue-600 text-white hover:bg-blue-700'
-                            }`}
-                    >
-                        {showAddTask ? 'Close Task Form' : '+ Create New Task'}
-                    </button>
                     {/* Logout Button */}
                     <div className='text-right'>
                         <button

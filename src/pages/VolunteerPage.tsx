@@ -60,7 +60,7 @@ export default function VolunteerDashboard() {
           setTasks(taskList);
 
           // 3. Check for new Urgent/Pending tasks for notification
-          const latestUrgent = taskList.find(t => t.priority === 'urgent' && t.status === 'pending');
+          const latestUrgent = taskList.find(t => t.priority === 'urgent' && (t.status === 'pending' || t.status === 'in-progress'));
           if (latestUrgent) setEmergencyNotification(latestUrgent);
         });
         return unsubTasks;

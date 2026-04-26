@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
 import type { Volunteer } from '../App';
-// interface Volunteer {
-//   id: string;
-//   name: string;
-//   role: string;
-//   status: string;
-//   position: { x: number; y: number };
-//   currentTask: string | null;
-// }
 
 interface VolunteerListProps {
   volunteers: Volunteer[];
@@ -28,7 +20,6 @@ const VolunteerList: React.FC<VolunteerListProps> = ({ volunteers, onAddVoluntee
   const handleVolunteerSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Create the full object expected by App.tsx
     const newVolunteer: Volunteer = {
       id: Date.now().toString(),
       name: formData.name,

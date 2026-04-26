@@ -1,5 +1,5 @@
 import { MapPin, User } from 'lucide-react';
-import type { Volunteer } from '../App'; // Step up to /app/ folder to get types
+import type { Volunteer } from '../App';
 
 interface VolunteerMapProps {
     volunteers: Volunteer[];
