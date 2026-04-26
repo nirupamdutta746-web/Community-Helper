@@ -20,15 +20,15 @@ We are actively working to evolve Community Helper into a full-scale coordinatio
 - Volunteer Leaderboard: A competitive ranking system to recognize top contributors and boost community engagement through "Honor Points."
 
 ## 🛠️ Technologies Used
-Vite & React: High-performance frontend framework.
+- Vite & React: High-performance frontend framework.
 
-TypeScript: Type-safe development for scalable architecture.
+- TypeScript: Type-safe development for scalable architecture.
 
-Firebase: Backend-as-a-Service for Auth and Real-time DB.
+- Firebase: Backend-as-a-Service for Auth and Real-time DB.
 
-Tailwind CSS: Professional, terminal-grade styling.
+- Tailwind CSS: Professional, terminal-grade styling.
 
-Lucide React - Minimalist iconography
+- Lucide React - Minimalist iconography
 
 ## 📂 Project Structure
 ```
@@ -56,20 +56,27 @@ Follow these steps to get the project running on your local machine:
 
 Clone the repository:
 
-Bash
+```Bash
 git clone https://github.com/nirupamdutta746-web/Community-Helper.git
+```
+
 Navigate into the project directory:
 
-Bash
+```Bash
 cd Community-Helper
+```
+
 Install the dependencies:
 
-Bash
+```Bash
 npm install
+```
+
 Start the development server:
 
-Bash
+```Bash
 npm start
+```
 
 ## 💡 Usage Examples
 Accessing the Dashboard
