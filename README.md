@@ -2,27 +2,37 @@
 A streamlined, terminal-inspired administration dashboard designed for NGOs to manage community resources and personnel. This project solves the problem of cluttered administrative interfaces by providing a clean, command-line-style environment for tracking volunteer directories and real-time emergency tasks.
 
 ## 🛠️ Technologies Used
-React.js - Component-based UI development
+Vite - For a lightning-fast development environment and bundling.
 
-Tailwind CSS - Utility-first styling for the terminal aesthetic
+TypeScript - Providing type safety across the terminal and data components.
 
-JavaScript (ES6+) - Logic and interactivity
+Firebase - Powering real-time database updates and authentication.
+
+React - The core library for the UI.
+
+Tailwind CSS - Used for the "NGO Admin Terminal" aesthetic and organized layouts.
 
 Lucide React - Minimalist iconography
 
 ## 📂 Project Structure
 ```
-Plaintext
 ├── src/
-│   ├── components/
-│   │   ├── VolunteerDirectory/   # Full-width database management
-│   │   ├── EmergencyFeed/        # Organized community task tracking
-│   │   └── TerminalUI/           # Core layout and styling wrappers
-│   ├── App.js                    # Main application entry point
-│   └── index.css                 # Tailwind and global styles
-├── public/                       # Static assets
-├── package.json                  # Dependencies and scripts
-└── README.md
+│   ├── app/
+│   │   └── components/
+│   │       ├── TaskManagement.tsx    # Management of emergency tasks
+│   │       ├── VolunteerList.tsx      # Full-width volunteer database
+│   │       └── VolunteerMap.tsx       # Geospatial view of volunteers
+│   │   └── App.tsx                    # Main app logic
+│   ├── pages/
+│   │   ├── AdminTerminal.tsx          # Core terminal dashboard interface
+│   │   ├── LoginPage.tsx              # Authentication portal
+│   │   └── VolunteerPage.tsx          # Public-facing volunteer view
+│   ├── styles/                        # Custom CSS and themes
+│   ├── firebase.ts                    # Backend configuration & initialization
+│   └── main.tsx                       # React DOM entry point
+├── package.json                       # Project dependencies
+├── vite.config.ts                     # Build tool configuration
+└── tsconfig.json                      # TypeScript configuration
 ```
 
 ## 🚀 Installation Instructions
