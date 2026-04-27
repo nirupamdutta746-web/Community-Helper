@@ -35,49 +35,46 @@ VITE_FIREBASE_APP_ID=your_app_id
 ## 📂 Project Structure
 ```
 ├── src/
-│   ├── app/
-│   │   └── components/
-│   │       ├── TaskManagement.tsx    # Management of emergency tasks
-│   │       ├── VolunteerList.tsx      # Full-width volunteer database
-│   │       └── VolunteerMap.tsx       # Geospatial view of volunteers
-│   │   └── App.tsx                    # Main app logic
-│   ├── pages/
-│   │   ├── AdminTerminal.tsx          # Core terminal dashboard interface
-│   │   ├── LoginPage.tsx              # Authentication portal
-│   │   └── VolunteerPage.tsx          # Public-facing volunteer view
-│   ├── styles/                        # Custom CSS and themes
-│   ├── firebase.ts                    # Backend configuration & initialization
-│   └── main.tsx                       # React DOM entry point
-├── package.json                       # Project dependencies
-├── vite.config.ts                     # Build tool configuration
-└── tsconfig.json                      # TypeScript configuration
+│   ├── app/                # Global state/logic
+│   │   ├── components/     # UI Components
+│   │   │   ├── TaskManagement.tsx
+│   │   │   ├── VolunteerList.tsx
+│   │   │   └── VolunteerMap.tsx
+│   │   └── App.tsx         # Main App Component
+│   ├── pages/              # Route-level components
+│   │   ├── AdminTerminal.tsx
+│   │   ├── LoginPage.tsx
+│   │   └── VolunteerPage.tsx
+│   ├── firebase.ts         # Firebase initialization
+│   ├── main.tsx            # Entry point
+│   └── vite-env.d.ts       # Vite TypeScript types
+├── .env                    # Local environment variables
+├── .gitignore            
+├── index.html              # Main HTML file 
+├── vite.config.ts
+└── tsconfig.json
 ```
 
-## 🚀 Installation Instructions
-Follow these steps to get the project running on your local machine:
+🚀 Installation Instructions
 
 Clone the repository:
-
-```Bash
-git clone https://github.com/nirupamdutta746-web/Community-Helper.git
 ```
-
-Navigate into the project directory:
-
-```Bash
+Bash
+git clone [https://github.com/nirupamdutta746-web/Community-Helper.git](https://github.com/nirupamdutta746-web/Community-Helper.git)
 cd Community-Helper
 ```
-
-Install the dependencies:
-
-```Bash
+Install dependencies:
+```
+Bash
 npm install
 ```
+Set up Firebase:
+Create a .env file in the root directory and add your Firebase credentials (see Environment Variables section).
 
 Start the development server:
-
-```Bash
-npm start
+```
+Bash
+npm run dev
 ```
 
 ## 💡 Usage Examples
