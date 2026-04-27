@@ -87,17 +87,19 @@ export default function AdminTerminal() {
         const volunteer = volunteers.find(v => v.name === task.assignedTo);
 
         try {
-            await updateDoc(taskRef, { status: 'completed', 
-                assignedTo: null, 
-                priority: 'low' });
+            await updateDoc(taskRef, {
+                status: 'completed',
+                assignedTo: null,
+                priority: 'low'
+            });
             if (volunteer) {
                 await updateDoc(doc(db, "volunteers", volunteer.id),
-                 { currentTask: null , status: 'active' });
+                    { currentTask: null, status: 'active' });
             }
-            await updateDoc(doc(db, "users", volunteer.id), { 
+            await updateDoc(doc(db, "users", volunteer.id), {
                 currentTask: null,
-                status: 'active' 
-            });  
+                status: 'active'
+            });
             alert(`Task verified! Volunteer is now available.`);
         } catch (error) {
             console.error("Error verifying task:", error);
@@ -115,8 +117,13 @@ export default function AdminTerminal() {
     };
 
     const urgentTasks = tasks.filter(t => t.priority === 'urgent' && t.status !== 'completed');
-    const availableVolunteers = volunteers.filter(v => !v.currentTask);
-    const activeVolunteers = volunteers.filter(v => v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'available');
+    const availableVolunteers = volunteers.filter(v =>
+        (v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'available') &&
+        !v.currentTask
+    );
+   const activeVolunteers = volunteers.filter(v => 
+    v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'busy'
+   );
 
     const handleLogout = async () => {
         try {
@@ -160,7 +167,7 @@ export default function AdminTerminal() {
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <StatCard label="Active" value={activeVolunteers.length} icon={<Users className="text-blue-600" />} bg="bg-blue-100" />
-                    <StatCard label="Available" value={availableVolunteers.length} icon={<Activity className="text-green-600" />} bg="bg-green-100" />
+                    <StatCard label="Volunteers" value={availableVolunteers.length} icon={<Activity className="text-green-600" />} bg="bg-green-100" />
                     <StatCard label="Urgent" value={urgentTasks.length} icon={<AlertCircle className="text-red-600" />} bg="bg-red-100" />
                     <StatCard label="In Review" value={tasks.filter(t => t.status === 'awaiting-review').length} icon={<CheckSquare className="text-amber-600" />} bg="bg-amber-100" />
                 </div>
