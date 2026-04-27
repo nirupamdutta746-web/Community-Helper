@@ -21,6 +21,7 @@ We are actively working to evolve Community Helper into a full-scale coordinatio
 - **Firebase**: Backend-as-a-Service for Auth and Real-time Firestore DB.
 - **Tailwind CSS**: Professional, terminal-grade styling.
 - **Lucide React**: Minimalist iconography.
+- **Gemini**: for debugging code and research
 
 ## 🔑 Environment Variables
 To run this project, you must set up the following environment variables in your `.env` file (local) or your deployment platform (e.g., Vercel):
