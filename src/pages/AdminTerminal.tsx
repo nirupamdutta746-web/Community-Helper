@@ -64,7 +64,7 @@ export default function AdminTerminal() {
 
             await updateDoc(taskRef, {
                 assignedTo: volunteer.name,
-                assignedToId: volunteer.id, // 👈 ADD THIS
+                assignedToId: volunteer.id, 
                 status: 'in-progress'
             });
             await updateDoc(volRef, {
@@ -117,13 +117,19 @@ export default function AdminTerminal() {
     };
 
     const urgentTasks = tasks.filter(t => t.priority === 'urgent' && t.status !== 'completed');
-    const availableVolunteers = volunteers.filter(v =>
-        (v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'available') &&
+    
+    // REVERTED LOGIC: Shows all available volunteers for the modal
+    const availableForAssignment = volunteers.filter(v =>
+        (v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'available' || v.status?.toLowerCase() === 'busy') &&
         !v.currentTask
     );
-   const activeVolunteers = volunteers.filter(v => 
-    v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'busy'
-   );
+
+    // CHANGE: totalVolunteers now reflects the entire registry count
+    const totalVolunteersCount = volunteers.length;
+
+    const activeVolunteers = volunteers.filter(v => 
+        v.status?.toLowerCase() === 'active' || v.status?.toLowerCase() === 'busy'
+    );
 
     const handleLogout = async () => {
         try {
@@ -139,6 +145,7 @@ export default function AdminTerminal() {
             console.error("Error logging out:", error);
         }
     };
+
     if (loading) {
         return (
             <div className="h-screen w-screen flex items-center justify-center bg-slate-50">
@@ -152,7 +159,6 @@ export default function AdminTerminal() {
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-slate-900 mb-2">NGO Admin Terminal</h1>
                     <p className="text-slate-600">Real-time volunteer coordination and verification</p>
-                    {/* Logout Button */}
                     <div className='text-right'>
                         <button
                             onClick={handleLogout}
@@ -161,13 +167,12 @@ export default function AdminTerminal() {
                             Logout
                         </button>
                     </div>
-
                 </div>
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <StatCard label="Active" value={activeVolunteers.length} icon={<Users className="text-blue-600" />} bg="bg-blue-100" />
-                    <StatCard label="Volunteers" value={availableVolunteers.length} icon={<Activity className="text-green-600" />} bg="bg-green-100" />
+                    <StatCard label="Volunteers" value={totalVolunteersCount} icon={<Activity className="text-green-600" />} bg="bg-green-100" />
                     <StatCard label="Urgent" value={urgentTasks.length} icon={<AlertCircle className="text-red-600" />} bg="bg-red-100" />
                     <StatCard label="In Review" value={tasks.filter(t => t.status === 'awaiting-review').length} icon={<CheckSquare className="text-amber-600" />} bg="bg-amber-100" />
                 </div>
@@ -208,15 +213,12 @@ export default function AdminTerminal() {
                     </div>
                 </div>
 
-                {/* BOTTOM MANAGEMENT SECTION */}
                 <div className="mt-10 space-y-10">
-                    {/* TASK MANAGEMENT BLOCK */}
                     <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
                         <TaskManagement
-                            tasks={tasks} // Provides the live list of tasks
+                            tasks={tasks}
                             onAddTask={async (taskData) => {
                                 try {
-                                    // Saves the new task data directly to Firestore
                                     await addDoc(collection(db, "tasks"), {
                                         ...taskData,
                                         createdAt: new Date().toISOString()
@@ -245,7 +247,7 @@ export default function AdminTerminal() {
             {selectedTask && (
                 <AssignTaskModal
                     task={selectedTask}
-                    volunteers={availableVolunteers}
+                    volunteers={availableForAssignment}
                     onAssign={handleAssignTask}
                     onClose={() => setSelectedTask(null)}
                 />
@@ -260,7 +262,7 @@ function StatCard({ label, value, icon, bg }: any) {
             <div className="flex items-center justify-between">
                 <div>
                     <div className="text-sm text-slate-600 mb-1">{label}</div>
-                    <div className="font-bold text-slate-900">{value}</div>
+                    <div className="font-bold text-slate-900 text-2xl">{value}</div>
                 </div>
                 <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center`}>{icon}</div>
             </div>

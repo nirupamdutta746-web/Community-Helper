@@ -81,7 +81,7 @@ const VolunteerList: React.FC<VolunteerListProps> = ({ volunteers, onAddVoluntee
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-slate-800">Verified Volunteers</h2>
           <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
-            {volunteers.length} Active Members
+            {volunteers.length} Members
           </span>
         </div>
 
