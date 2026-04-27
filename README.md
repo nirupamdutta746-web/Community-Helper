@@ -1,35 +1,37 @@
 # Community Helper 🤝
-Community Helper is a robust, terminal-inspired dashboard designed to streamline NGO operations. By providing a centralized, command-line-style interface, it simplifies the management of volunteer databases and high-priority emergency tasks, ensuring that community aid is coordinated with precision and speed.
+Community Helper is a robust, terminal-inspired dashboard designed to streamline NGO operations. By providing a centralized interface, it simplifies the management of volunteer databases and high-priority emergency tasks, ensuring community aid is coordinated with precision and speed.
 
 ## ✨ Key Features
-- Terminal-Centric Dashboard: A clean, high-efficiency UI for rapid data oversight.
-
-- Volunteer Management: Full-width directory tracking and specialized volunteer views.
-
-- Real-Time Task Feed: Organized emergency task management to prioritize urgent community needs.
-
-- Secure Infrastructure: Integrated with Firebase for real-time data syncing and secure user authentication.
+- **Terminal-Centric Dashboard**: A clean, high-efficiency UI for rapid data oversight and management.
+- **Volunteer Registry**: A comprehensive database tracking the total number of registered volunteers and their real-time availability.
+- **Dynamic Task Dispatch**: Advanced task creation including specific location details and estimated time requirements.
+- **Proof of Work Verification**: Seamless submission and review process for task completion with supporting links/evidence.
+- **Secure Infrastructure**: Integrated with Firebase for real-time data syncing and secure user authentication.
 
 ## 🛣️ Future Prospects & Roadmap
-We are actively working to evolve Community Helper into a full-scale coordination suite. Upcoming features include:
-
-- Live Volunteer Mapping: Integration of a real-time geospatial system to track and display the live location of all active volunteers for better task delegation.
-
-- Volunteer Honor System: A points-based gamification engine that tracks the completion rate and reliability of every team member.
-
-- Volunteer Leaderboard: A competitive ranking system to recognize top contributors and boost community engagement through "Honor Points."
+We are actively working to evolve Community Helper into a full-scale coordination suite:
+- **Volunteer Honor System**: A points-based gamification engine tracking completion rates and reliability.
+- **Volunteer Leaderboard**: A competitive ranking system to recognize top contributors through "Honor Points."
+- **Real-Time Volunteer Mapping**: A live geospatial system tracking active volunteers for optimized task delegation.
+- **Offline Mode**: Local caching for areas with limited connectivity.
 
 ## 🛠️ Technologies Used
-- Vite & React: High-performance frontend framework.
+- **Vite & React**: High-performance frontend framework.
+- **TypeScript**: Type-safe development for scalable architecture.
+- **Firebase**: Backend-as-a-Service for Auth and Real-time Firestore DB.
+- **Tailwind CSS**: Professional, terminal-grade styling.
+- **Lucide React**: Minimalist iconography.
 
-- TypeScript: Type-safe development for scalable architecture.
+## 🔑 Environment Variables
+To run this project, you must set up the following environment variables in your `.env` file (local) or your deployment platform (e.g., Vercel):
 
-- Firebase: Backend-as-a-Service for Auth and Real-time DB.
-
-- Tailwind CSS: Professional, terminal-grade styling.
-
-- Lucide React - Minimalist iconography
-
+```bash
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ## 📂 Project Structure
 ```
 ├── src/
