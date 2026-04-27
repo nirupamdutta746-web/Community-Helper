@@ -25,7 +25,8 @@ We are actively working to evolve Community Helper into a full-scale coordinatio
 ## 🔑 Environment Variables
 To run this project, you must set up the following environment variables in your `.env` file (local) or your deployment platform (e.g., Vercel):
 
-```bash
+bash
+```
 VITE_FIREBASE_API_KEY=your_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
 VITE_FIREBASE_PROJECT_ID=your_project_id
@@ -59,22 +60,25 @@ VITE_FIREBASE_APP_ID=your_app_id
 🚀 Installation Instructions
 
 Clone the repository:
-```
+
 Bash
+```
 git clone https://github.com/nirupamdutta746-web/Community-Helper.git
 cd Community-Helper
 ```
 Install dependencies:
-```
+
 Bash
+```
 npm install
 ```
 Set up Firebase:
 Create a .env file in the root directory and add your Firebase credentials (see Environment Variables section).
 
 Start the development server:
-```
+
 Bash
+```
 npm run dev
 ```
 
