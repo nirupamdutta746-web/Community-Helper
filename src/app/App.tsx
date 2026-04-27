@@ -22,6 +22,7 @@ export interface Task {
   description: string;
   priority: 'urgent' | 'high' | 'medium' | 'low';
   location: string;
+  timeRequired: string;
   estimatedTime: string;
   assignedTo: string | null;
   status: 'pending' | 'in-progress' | 'awaiting-review' | 'completed';
