@@ -61,7 +61,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 Clone the repository:
 ```
 Bash
-git clone [https://github.com/nirupamdutta746-web/Community-Helper.git](https://github.com/nirupamdutta746-web/Community-Helper.git)
+git clone https://github.com/nirupamdutta746-web/Community-Helper.git
 cd Community-Helper
 ```
 Install dependencies:
